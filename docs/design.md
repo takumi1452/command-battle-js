@@ -124,30 +124,55 @@
 - 例外：
 
 #### UC-02: プレイヤーがコマンドを選択して1ターン進む（B01）
-- トリガー： プレイヤー「戦う」をクリックする。
+- トリガー： 攻撃コマンド（sword / fireball）をクリックする
 - 前提条件：
-  - currentScrean = B01
+  - currentScreen = B01
   - isProcessing = false
   - 「ファイヤーボール」を選択したとき、playerMp >= fireballMp
 - 入力：
-  - 「戦う」をクリック
+  - 攻撃コマンド（sword / fireball）をクリック
 - 処理手順：
-  1. コマンドの入力
-     1. コマンド表示の変更「戦う」→「剣」「魔法」
-     2. 「魔法」を選択した場合、「魔法」→「ファイヤーボール」
-     3. プレイヤーが「剣」または「ファイヤーボール」を選択
-  2. isProcessing を true にする（多重入力防止）
+  1. isProcessing を true にする（多重入力防止）
+  2. プレイヤー行動内容を gameText に設定し、表示を更新する
+  3. 一定時間待機する
+  4. プレイヤー行動を適用する
+     - sword: enemyHp を swordDamage 分減らす
+     - fireball: enemyHp を fireballDamage分減らし、playerMp を fireballMp 分減らす
+  5. 表示を更新する（enemyHp/playerMp）
+  6. 勝敗判定を行う（enemyHp <= 0ならUC-03へ）
+  7. 敵行動内容を gameText に設定し、表示を更新する
+  8. 一定時間待機する
+  9. 敵行動を適用する（playerHpをattackDamage分減らす）
+  10. 表示を更新する（playerHp）
+  11. 勝敗判定を行う（playerHp <= 0ならUC-03へ）
+  12. currentTurn を +1 する
+  13. 画面表示を更新する（HP/MP/ゲームテキスト/ターン表示）
+  14. isProcessing を false にする
 - 出力：
+  - HP/MP/ゲームテキスト/ターン表示の更新
+  - 必要なら R01 へ遷移
 - 例外：
+  - isProcessing を true の場合は何もしない
+  - MP不足時は fireball ボタンを無効化（押せない）
 
 #### UC-03: 勝敗が確定して結果を見る（B01）
-- トリガー： 
+- トリガー： 勝敗判定の結果、playerHp <= 0 または enemyHp <= 0となった
 - 前提条件：
+  - currentScreen = B01
+  - isProcessing = true
 - 入力：
+  - なし（内部処理）
 - 処理手順：
-  1. 
+  1. gameText に「〇〇が倒れた」を設定して表示更新（〇〇：倒れた方の名前）
+  2. 一定時間待機
+  3. currentScreen = R01
+  4. isProcessing = false
 - 出力：
+  - gameText の更新と表示
+  - R01 への遷移
 - 例外：
+  - UC-03 の処理中は、ユーザー入力を受け付けない
+
 
 #### UC-04: リスタートする（R01）
 - トリガー： 
