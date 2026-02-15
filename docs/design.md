@@ -115,13 +115,26 @@
 
 ### 7.2 UC詳細
 #### UC-01: プレイヤーがゲームを開始する（S01）
-- トリガー： 
+- トリガー： プレイヤーがゲーム開始ボタンをクリックする
 - 前提条件：
+  - currentScreen = S01
+  - isProcessing = false
 - 入力：
+  - ゲーム開始ボタンをクリック
 - 処理手順：
-  1. 
+  1. isProcessing を true にする
+  2. playerHp、playerMpを初期値に設定する
+  3. enemyHp、attackDamageを初期値（将来はランダム値）に設定する
+  4. currentTurn を 1 に設定する
+  5. gameText を初期状態に設定する
+  6. currentScreen = B01
+  7. 表示を更新（画面切り替え、初期ステータス表示）
+  8. isProcessing を false にする
 - 出力：
+  - B01 への遷移
+  - ステータスの初期化と表示
 - 例外：
+  - UC-01 の処理中は、ユーザー入力を受け付けない
 
 #### UC-02: プレイヤーがコマンドを選択して1ターン進む（B01）
 - トリガー： 攻撃コマンド（sword / fireball）をクリックする
@@ -175,13 +188,25 @@
 
 
 #### UC-04: リスタートする（R01）
-- トリガー： 
+- トリガー： プレイヤーがリスタートボタンをクリック
 - 前提条件：
+  - currentScreen = R01
+  - isProcessing = false
 - 入力：
+  - リスタートボタンをクリック
 - 処理手順：
-  1. 
+  1. isProcessing を true にする
+  2. playerHp、playerMpを初期値に戻す
+  3. enemyHp、attackDamageを初期値（将来はランダム値）に戻す
+  4. currentTurn を 1 に戻す
+  5. gameText を初期状態に戻す
+  6. currentScreen = S01
+  7. isProcessing を false にする
 - 出力：
+  - S01 への遷移
+  - 全ステータスの初期化
 - 例外：
+  - UC-04 の処理中は、ユーザー入力を受け付けない
 
 ## 8. 関数・モジュール設計（責務分割）
 - 
