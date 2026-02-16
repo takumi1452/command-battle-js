@@ -71,16 +71,29 @@
   - isProcessing（行動処理中かどうか）
   - gameText（現在の戦闘に関するメッセージ）
 - player
-  - hp
-  - mp
+  - playerHp
+  - playerMp
 - enemy
-  - hp
+  - enemyHp
   - attackDamage
 
 
 ### 5.3 状態遷移
 | イベント | 前提 | 変更される状態 | 表示更新 |
 |---|---|---|---|
+| ゲーム開始ボタン | S01 & isProcessing=false | currentScreen=B01、ステータス（playerHp、playerMp、enemyHp、attackDamage）を初期値に設定、currentTurn=1、gameTextを初期状態に設定、isProcessing=false | S01→B01 |
+| コマンド（sword/fireball）選択確定 | B01 & isProcessing=false | isProcessing=true、プレイヤー行動内容をgameTextに設定 | gameText | 
+| プレイヤー行動（sword）メッセージ待機終了 | B01 & isProcessing=true | enemyHp -= swordDamage | enemyHp |
+| プレイヤー行動（fireball）メッセージ待機終了 | B01 & isProcessing=true | enemyHp-=fireballDamage、playerMp-=fireballMp | enemyHp、playerMp |
+| 勝敗判定（敵） | B01 & isProcessing=true & enemyHp<=0 | gameText=敵は倒れた | gameText |
+| 勝敗メッセージ待機終了 | B01 & isProcessing=true & gameText=敵は倒れた | currentScreen=R01、isProcessing=false | B01→R01 |
+| 敵行動内容テキスト表示 | B01 & isProcessing=true | 敵行動内容をgameTextに設定  | gameText |
+| 敵行動メッセージ待機終了 | B01 & isProcessing=true | playerHp-=attackDamage  | playerHp |
+| 勝敗判定（プレイヤー） | B01 & isProcessing=true & playerHp<=0 | gameText=プレイヤーは倒れた | gameText |
+| 勝敗メッセージ待機終了 | B01 & isProcessing=true & gameText=プレイヤーは倒れた | currentScreen=R01、isProcessing=false | B01→R01 |
+| ゲーム継続 | B01 & isProcessing=true & enemyHp>0 & playerHp>0 | currentTurn+=1、isProcessing=false | 画面表示を更新（gameText/ターン表示） |
+| リスタートボタン | R01 & isProcessing=false | currentScreen=S01、ステータス（playerHp、playerMp、enemyHp、attackDamage）を初期値に設定、currentTurn=1、gameTextを初期状態に設定 | R01→S01 |
+
 
 ## 6. ドメイン設計（ルール・計算・制約）
 ### 6.1 ルール
@@ -159,7 +172,7 @@
   10. 表示を更新する（playerHp）
   11. 勝敗判定を行う（playerHp <= 0ならUC-03へ）
   12. currentTurn を +1 する
-  13. 画面表示を更新する（HP/MP/ゲームテキスト/ターン表示）
+  13. 画面表示を更新する（ゲームテキスト/ターン表示）
   14. isProcessing を false にする
 - 出力：
   - HP/MP/ゲームテキスト/ターン表示の更新
