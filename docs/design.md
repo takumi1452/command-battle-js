@@ -273,16 +273,36 @@
     - UC-02 の大枠を担う関数
     - 必要な関数を必要な時に呼び出す関数
   - トリガー
-    - コマンド(sword / fireball)
+    - コマンド(sword / fireball)押下時
   - 前提条件
     - currentScreen = B01
     - isProcessing = false
   - 入力
-    - なし（クリックイベントを契機に実行）
+    - commandType （sword または fireball）を引数で受け取る
   - 処理内容
+    1. isProcessing が true の場合は return する（多重入力防止）
+    2. isProcessing = true
+    3. processPlayerTurn(commandType) を呼ぶ
+    4. checkVictory() を呼ぶ
+    5. processEnemyTurn() を呼ぶ
+    6. checkVictory() を呼ぶ
+    7. finalizeTurn() を呼ぶ
+    8. isProcessing = false
   - 出力
+    - プレイヤーの行動→敵行動までの1ターンの処理が進む
+    - state の更新
+    - R01 への遷移の可能性あり（勝敗がついた場合）
   - 副作用
+    - isProcessing を変更（true / false）
+    - 関数内部または呼び出した関数内で state 変更が起きる
+    - 呼び出した関数内で非同期（待機）が関わる可能性がある
+    - 呼び出した関数内で render 呼び出しによりDOM更新が発生し得る
   - 備考
+    - isProcessing チェックで多重入力を防ぐ
+    - commandType は引数で受け取る
+    - gameText をロジック判断に使わない
+    - 勝敗確定後は以降の処理を中断する
+    - checkVictory は勝敗判定に用いる
 - processPlayerTurn()
   - 役割
   - トリガー
